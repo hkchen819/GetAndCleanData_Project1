@@ -1,5 +1,4 @@
 # Human Activity Recognition Using Smartphones
-***
 
 #### The original dataset: [http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones).
 
@@ -12,11 +11,11 @@
 >- An identifier of the subject who carried out the experiment.
 
 ### subject
-***
+
 #### There are 30 subjects included in this dataset.
 
 ### activity
-***
+
 #### Six activities are labeled, include:
 - WALKING
 - WALKING_UPSTAIRS
@@ -26,7 +25,6 @@
 - LAYING
 	
 ### 66 measurements
-***
 
 >-      Prefix **'t'** to denote time, prefix **'f'** to indicate frequency domain signals.
 >-      The acceleration signal from accelerometer was then separated into body and gravity acceleration signals (**tBodyAcc** and **tGravityAcc**).
@@ -104,6 +102,7 @@
 - fBodyBodyGyroJerkMag_std
 
 ## Tranformation
+
 ####The following transformations were performed on the default dataset:
 
 - The training and the test sets were merged together.
