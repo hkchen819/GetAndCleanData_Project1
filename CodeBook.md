@@ -1,6 +1,16 @@
 # Human Activity Recognition Using Smartphones
 
+## Data
+
 #### The original dataset: [http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones).
+
+- The experiments have been carried out with a group of 30 volunteers within an age bracket of 19-48 years. Each person performed six activities listed below wearing a smartphone (Samsung Galaxy S II) on the waist. 
+
+- Using its embedded accelerometer and gyroscope, 3-axial linear acceleration and 3-axial angular velocity are captured at a constant rate of 50Hz. The experiments have been video-recorded to label the data manually.
+
+- The obtained dataset has been randomly partitioned into two sets, where 70% of the volunteers was selected for generating the training data and 30% the test data.
+
+
 
 
 ## Variables
@@ -101,11 +111,75 @@
 - fBodyBodyGyroJerkMag_mean
 - fBodyBodyGyroJerkMag_std
 
-## Tranformation
+## Tranformation performed to clean up the data
 
 ####The following transformations were performed on the default dataset:
 
-- The training and the test sets were merged together.
-- Only the measurements on the mean and standard deviation were extracted.
-- Descriptive activity and variable names were labeled.
-- A second tidy data set with the average of each variable for each activity and each subject was created.
+- Get the default dataset.  
+**Download and unzip the dataset.**
+
+```r
+download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip",
+              destfile = "data.zip")
+unzip("data.zip")
+```
+
+- The training and the test sets were merged together.  
+**Use rbind() in R.**
+
+```r
+train <- read.table("UCI HAR Dataset/train/X_train.txt")
+test <- read.table("UCI HAR Dataset/test/X_test.txt")
+data <- rbind(train, test)
+```
+
+- Only the measurements on the mean and standard deviation were extracted.  
+**Find feature names with mean() or std().**
+
+```r
+features <- read.table("UCI HAR Dataset/features.txt", stringsAsFactors = FALSE)
+mean_std_idx <- grep("(mean|std)\\(", features$V2)
+data_full <- data[mean_std_idx]
+```
+- Descriptive activity names were labeled.  
+**Use Human readable labels instead of numbers.**
+
+```r
+activity_train <- read.table("UCI HAR Dataset/train/y_train.txt")
+activity_test <- read.table("UCI HAR Dataset/test/y_test.txt")
+activity <- rbind(activity_train, activity_test)
+names(activity) <- "activity"
+activity_name <- read.table("UCI HAR Dataset/activity_labels.txt", col.names = c("level", "label"))
+activity <- factor(unlist(activity), labels = activity_name$label)
+```
+
+- Descriptive variable names were labeled.  
+**Replace all dash lines and parentheses with underline.**
+
+```r
+col_names <- gsub("\\(\\)$", "", features$V2[mean_std_idx])
+col_names <- gsub("(-|\\(\\))", "_", col_names)
+names(data_full) <- col_names
+```
+
+- Subject info is extracted and combined with activity info and measurements.  
+**Use rbind() and cbind() in R. Data frame "data_full" is generated.**
+
+
+```r
+subject_train <- read.table("UCI HAR Dataset/train/subject_train.txt")
+subject_test <- read.table("UCI HAR Dataset/test/subject_test.txt")
+subject <- rbind(subject_train, subject_test)
+names(subject) <- "subject"
+data_full <- cbind(subject, activity, data_full)
+```
+
+- A second tidy data set with the average of each variable for each activity and each subject was created. Stored the data set into file.  
+**Use aggregate() in R to separate data into groups by each subject and each activity and get the average of each variable as data frame "data_tidy".  **
+**Use write.table() to store the final result.**
+
+
+```r
+data_tidy <- aggregate(.~subject+activity, data = data_full, mean)
+write.table(data_tidy, "analysis.txt", row.name=FALSE)
+```
